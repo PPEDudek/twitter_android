@@ -1,4 +1,4 @@
-package com.bachelor.robin.api_twitter;
+package com.bachelor.robin.android_twitter;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

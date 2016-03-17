@@ -1,4 +1,4 @@
-package com.bachelor.robin.api_twitter.tweet;
+package com.bachelor.robin.android_twitter.tweet;
 
 public class Tweet {
     private String date = "";

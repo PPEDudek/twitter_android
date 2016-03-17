@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.bachelor.robin.api_twitter"
+        applicationId "com.bachelor.robin.android_twitter"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
@@ -20,7 +20,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
+    compile files('C:/Users/rorod/AndroidStudioProjects/Android_twitter/libs/http-core-4.1 (1).jar')
 }

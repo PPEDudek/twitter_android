@@ -1,4 +1,6 @@
-package com.bachelor.robin.api_twitter.json;
+package com.bachelor.robin.android_twitter.json;
+
+import android.widget.ImageView;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.bachelor.robin.api_twitter.tweet.Tweet;
+import com.bachelor.robin.android_twitter.tweet.Tweet;
 
 public class Json {
     static JSONArray jobj = null;
@@ -18,11 +20,12 @@ public class Json {
     private ArrayList<Tweet> tweets = new ArrayList<>();
 
 
-    public JSONArray ReadJson(StringBuilder response) throws IOException, JSONException {
-        json = response.toString();
+    public JSONArray ReadJson(String response) throws IOException, JSONException {
+        json = response;
         ParseJson();
         return jobj;
     }
+
 
     public void ParseJson () throws JSONException {
         String tempDate = "";

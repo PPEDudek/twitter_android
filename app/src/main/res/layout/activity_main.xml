@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,19 +9,60 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".main.MainActivity">
 
-    <ListView
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        tools:background="#AAA"
+        />
+
+    <TextView
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tweetList"
-        android:layout_below="@+id/searchView" />
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/avatar"
+        android:layout_alignTop="@+id/avatar"
+        android:textStyle="bold"
+        tools:text="Pseudo"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:text="\@Name"
+        android:id="@+id/pseudo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/name"
+        android:layout_toEndOf="@+id/name" />
 
     <SearchView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/searchView"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/avatar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/button" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:id="@+id/button"
+
+        android:layout_alignTop="@+id/searchView"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tweetList"
+        android:layout_below="@+id/searchView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
