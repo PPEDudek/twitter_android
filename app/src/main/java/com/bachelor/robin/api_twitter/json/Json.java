@@ -12,53 +12,19 @@ import org.json.JSONObject;
 import com.bachelor.robin.api_twitter.tweet.Tweet;
 
 public class Json {
-
     static JSONArray jobj = null;
     static String json = "";
 
     private ArrayList<Tweet> tweets = new ArrayList<>();
 
-    public Json() {
-        try {
-            jobj = ReadJson();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (JSONException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        try {
-            ParseJson();
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    public JSONArray ReadJson() throws IOException, JSONException {
-        // Read Json file for test
 
-        BufferedReader reader = new BufferedReader(new FileReader("C:/Users/rorod/Downloads/home.json"));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            while ((line = reader.readLine())!= null) {
-                sb.append(line+"\n");
-            }
-            json = sb.toString();
-            try {
-                jobj = new JSONArray(json);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        reader.close();
+    public JSONArray ReadJson(StringBuilder response) throws IOException, JSONException {
+        json = response.toString();
+        ParseJson();
         return jobj;
     }
 
-    public void ParseJson() throws JSONException {
+    public void ParseJson () throws JSONException {
         String tempDate = "";
         String tempText = "";
         String tempName = "";
@@ -77,6 +43,7 @@ public class Json {
             tempDate = tweetObj.getString("created_at");
             tempText = tweetObj.getString("text");
 
+
             // Récupération premier tweet -> user
             JSONObject userObj = tweetObj.getJSONObject("user");
             tempName = userObj.getString("name");
@@ -89,14 +56,10 @@ public class Json {
     }
 
 
-	/*
-	 * GETTERS
-	 *
-	 */
-
-
-
-
+    /*
+     * GETTERS & SETTERS
+     *
+     */
     public ArrayList<Tweet> getTweets() {
         return tweets;
     }
