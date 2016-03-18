@@ -1,23 +1,4 @@
 package com.bachelor.robin.android_twitter.api;
-import android.util.Base64;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -40,15 +21,31 @@ import org.apache.http.protocol.RequestExpectContinue;
 import org.apache.http.protocol.RequestTargetHost;
 import org.apache.http.protocol.RequestUserAgent;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UserApi extends TwitterApi {
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
-    private String userUrl = "https://api.twitter.com/1.1/account/verify_credentials.json";
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
-    public JSONObject userInfo() throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
+/**
+ * Created by rorod on 18/03/2016.
+ */
+public class TimelineApi extends TwitterApi {
+
+    private String resourceUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+
+    public String getTwitterAuth() throws URISyntaxException, NoSuchAlgorithmException, InvalidKeyException, IOException {
         JSONObject jsonresponse = new JSONObject();
+
 
         String oauthNonce = createNonce();
 
@@ -65,22 +62,22 @@ public class UserApi extends TwitterApi {
                 oauthVersion);
 
         String baseStringTemp = "";
-        String baseString = baseStringTemp.concat(uriEscape("GET")).concat("&").concat(uriEscape(userUrl)).concat("&").concat(uriEscape((tempBaseFormat)));
-
+        String baseString = baseStringTemp.concat(uriEscape("GET")).concat("&").concat(uriEscape(resourceUrl)).concat("&").concat(uriEscape((tempBaseFormat)));
 
         oauthSignature = createSignature(baseString);
 
+
         String tempHeaderFormat = createHeader(oauthTimeStamp, oauthNonce);
 
-        StringBuilder inputRequest = null;
-
+        //Notre code pour la connection à l'api pour l'appli java ne passe pas sur Android du coup
+        // on prend le code copier coller des autres groupes pour tester
         BasicHttpParams params = new BasicHttpParams();
         HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
         HttpProtocolParams.setContentCharset(params, "UTF-8");
         HttpProtocolParams.setUserAgent(params, "HttpCore/1.1");
         HttpProtocolParams.setUseExpectContinue(params, false);
 
-        HttpProcessor httpproc = new ImmutableHttpProcessor(new HttpRequestInterceptor[] {
+        HttpProcessor httpProc = new ImmutableHttpProcessor(new HttpRequestInterceptor[] {
                 // Required protocol interceptors
                 new RequestContent(),
                 new RequestTargetHost(),
@@ -89,14 +86,13 @@ public class UserApi extends TwitterApi {
                 new RequestUserAgent(),
                 new RequestExpectContinue()});
 
-        HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
+        HttpRequestExecutor httpExecutor = new HttpRequestExecutor();
         HttpContext context = new BasicHttpContext(null);
         HttpHost host = new HttpHost("api.twitter.com",443);
         DefaultHttpClientConnection conn = new DefaultHttpClientConnection();
 
         context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
         context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, host);
-
         try {
             try {
                 SSLContext sslcontext = SSLContext.getInstance("TLS");
@@ -108,13 +104,13 @@ public class UserApi extends TwitterApi {
                 conn.bind(socket, params);
 
                 // the following line adds 3 params to the request just as the parameter string did above. They must match up or the request will fail.
-                BasicHttpEntityEnclosingRequest request2 = new BasicHttpEntityEnclosingRequest("GET", "/1.1/account/verify_credentials.json");
+                BasicHttpEntityEnclosingRequest request2 = new BasicHttpEntityEnclosingRequest("GET", "/1.1/statuses/home_timeline.json" );
                 request2.setParams(params);
                 request2.addHeader("Authorization", tempHeaderFormat); // always add the Authorization header
-                httpexecutor.preProcess(request2, httpproc, context);
-                HttpResponse response2 = httpexecutor.execute(request2, conn, context);
+                httpExecutor.preProcess(request2, httpProc, context);
+                HttpResponse response2 = httpExecutor.execute(request2, conn, context);
                 response2.setParams(params);
-                httpexecutor.postProcess(response2, httpproc, context);
+                httpExecutor.postProcess(response2, httpProc, context);
 
                 if(response2.getStatusLine().toString().indexOf("500") != -1)
                 {
@@ -124,10 +120,8 @@ public class UserApi extends TwitterApi {
                 else
                 {
                     // if successful, the response should be a JSONObject of tweets
-                    JSONObject jo = new JSONObject(EntityUtils.toString(response2.getEntity()));
-
-                    jsonresponse.put("twitter_jo", jo); // this is the full result object from Twitter
-                    //}
+                    JSONArray jo = new JSONArray(EntityUtils.toString(response2.getEntity()));
+                    jsonresponse.put("twitter_jo", jo);
 
                     conn.close();
                 }
@@ -136,19 +130,19 @@ public class UserApi extends TwitterApi {
             {
                 System.out.println(he.getMessage());
                 jsonresponse.put("response_status", "error");
-                jsonresponse.put("message", "verifyCredentials HttpException message=" + he.getMessage());
+                jsonresponse.put("message", "searchTweets HttpException message=" + he.getMessage());
             }
             catch(NoSuchAlgorithmException nsae)
             {
                 System.out.println(nsae.getMessage());
                 jsonresponse.put("response_status", "error");
-                jsonresponse.put("message", "verifyCredentials NoSuchAlgorithmException message=" + nsae.getMessage());
+                jsonresponse.put("message", "searchTweets NoSuchAlgorithmException message=" + nsae.getMessage());
             }
             catch(KeyManagementException kme)
             {
                 System.out.println(kme.getMessage());
                 jsonresponse.put("response_status", "error");
-                jsonresponse.put("message", "verifyCredentials KeyManagementException message=" + kme.getMessage());
+                jsonresponse.put("message", "searchTweets KeyManagementException message=" + kme.getMessage());
             }
             finally {
                 conn.close();
@@ -156,18 +150,20 @@ public class UserApi extends TwitterApi {
         }
         catch(JSONException jsone)
         {
-
+            System.out.println("merdeJsonE");
         }
-        catch(IOException ioe)
-        {
-
+        catch(IOException ioe) {
+            System.out.println("remerdeIOE");
         }
+
+        String inputRequest = null;
         try {
-            jsonresponse = (JSONObject) jsonresponse.get("twitter_jo");
+            inputRequest = jsonresponse.get("twitter_jo").toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return jsonresponse;
-    }
 
+        System.out.println(inputRequest);
+        return inputRequest;
+    }
 }

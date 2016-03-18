@@ -17,8 +17,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bachelor.robin.android_twitter.R;
+import com.bachelor.robin.android_twitter.api.SearchApi;
+import com.bachelor.robin.android_twitter.api.TimelineApi;
+import com.bachelor.robin.android_twitter.api.UserApi;
 import com.bachelor.robin.android_twitter.modele.TweetModele;
-import com.bachelor.robin.android_twitter.api.TwitterApi;
 import com.bachelor.robin.android_twitter.json.Json;
 import com.bachelor.robin.android_twitter.tweet.Tweet;
 
@@ -49,13 +51,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        lv = (ListView) findViewById(R.id.tweetList);
+
+        //Enable double task
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().
                 permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        TwitterApi tah = new TwitterApi();
+
+        TimelineApi tah = new TimelineApi();
         Json json = new Json();
 
+
+        lv = (ListView) findViewById(R.id.tweetList);
         searchText = (EditText) findViewById(R.id.searchText);
         search = (Button) findViewById(R.id.search);
         search.setOnClickListener(this);
@@ -68,10 +74,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
 
         }
-        // This is the array adapter, it takes the context of the activity as a
-        // first parameter, the type of list view as a second parameter and your
-        // array as a third parameter.
-        ArrayList<Tweet> tweets = new ArrayList<>();
+
+        ArrayList<Tweet> tweets;
         tweets = json.getTweets();
 
         tweetAdapter = new TweetModele(MainActivity.this, tweets);
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void userAccount() {
-        TwitterApi ta = new TwitterApi();
+        UserApi ta = new UserApi();
         JSONObject jsonObj = new JSONObject();
         try {
             jsonObj = ta.userInfo();
@@ -130,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.search:
-                TwitterApi ta = new TwitterApi();
+                SearchApi ta = new SearchApi();
                 Json json = new Json();
                 String searchInput = searchText.getText().toString();
                 try {
@@ -145,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
 
+                searchText.setFocusable(false);
                 ArrayList<Tweet> tweets ;
                         tweets = json.getTweets();
                 tweetAdapter = new TweetModele(MainActivity.this, tweets);
@@ -152,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 // Set the new view
                 lv.setAdapter(tweetAdapter);
-
                 break;
 
             default:
