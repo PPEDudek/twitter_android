@@ -1,5 +1,6 @@
 package com.bachelor.robin.android_twitter.main;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -7,7 +8,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,11 +36,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private TweetModele tweetAdapter;
     private ListView lv;
     private ImageView avatar;
     private TextView pseudo;
     private TextView name;
+    private Button refresh;
+    private Button search;
+    private EditText searchText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         TwitterApi tah = new TwitterApi();
         Json json = new Json();
 
+        searchText = (EditText) findViewById(R.id.searchText);
+        search = (Button) findViewById(R.id.search);
+        search.setOnClickListener(this);
+        refresh = (Button) findViewById(R.id.refresh);
+        refresh.setOnClickListener(this);
         userAccount();
         try{
             json.ReadJson(tah.getTwitterAuth());
@@ -60,16 +73,8 @@ public class MainActivity extends AppCompatActivity {
         // array as a third parameter.
         ArrayList<Tweet> tweets = new ArrayList<>();
         tweets = json.getTweets();
-        /*ArrayList<String> tweetList = new ArrayList<>();
-        for(int i = 0; i < tweets.size(); i++) {
-            tweetList.add(tweets.get(i).getText());
-        }*/
 
-        /*ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                R.layout.row_tweet,
-                tweetList );*/
-        TweetModele tweetAdapter = new TweetModele(MainActivity.this, tweets);
+        tweetAdapter = new TweetModele(MainActivity.this, tweets);
         lv.setAdapter(tweetAdapter);
     }
 
@@ -114,5 +119,44 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+    public void onClick(View v) {
+        switch (v.getId()) {
+
+            case R.id.refresh:
+               Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+                break;
+
+            case R.id.search:
+                TwitterApi ta = new TwitterApi();
+                Json json = new Json();
+                String searchInput = searchText.getText().toString();
+                try {
+                    json.ReadJson(ta.searchTweet(searchInput));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                } catch (InvalidKeyException e) {
+                    e.printStackTrace();
+                }
+
+                ArrayList<Tweet> tweets ;
+                        tweets = json.getTweets();
+                tweetAdapter = new TweetModele(MainActivity.this, tweets);
+                tweetAdapter.notifyDataSetChanged();
+
+                // Set the new view
+                lv.setAdapter(tweetAdapter);
+
+                break;
+
+            default:
+                break;
+        }
     }
 }

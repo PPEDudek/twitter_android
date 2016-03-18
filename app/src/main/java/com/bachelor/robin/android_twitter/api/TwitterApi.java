@@ -377,7 +377,7 @@ public class TwitterApi {
                 conn.bind(socket, params);
 
                 // the following line adds 3 params to the request just as the parameter string did above. They must match up or the request will fail.
-                BasicHttpEntityEnclosingRequest request2 = new BasicHttpEntityEnclosingRequest("GET", "/1.1/search/tweets.json" + "?lang=en&result_type=mixed&q=" + uriEscape(s));
+                BasicHttpEntityEnclosingRequest request2 = new BasicHttpEntityEnclosingRequest("GET", "/1.1/search/tweets.json" + "?q=" + uriEscape(s));
                 request2.setParams(params);
                 request2.addHeader("Authorization", tempHeaderFormat); // always add the Authorization header
                 httpexecutor.preProcess(request2, httpproc, context);
@@ -434,7 +434,8 @@ public class TwitterApi {
         String searchRequest = null;
         try {
             JSONObject statuses = jsonresponse.getJSONObject("twitter_jo");
-            searchRequest = statuses.get("statuses").toString();
+            JSONArray jarray = statuses.getJSONArray("statuses");
+            searchRequest = jarray.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -618,7 +619,7 @@ public class TwitterApi {
                     }
                     else
                     {*/
-                        jsonresponse.put("twitter_jo", jo); // this is the full result object from Twitter
+                    jsonresponse.put("twitter_jo", jo); // this is the full result object from Twitter
                     //}
 
                     conn.close();
